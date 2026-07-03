@@ -28,9 +28,27 @@ function BootcampDetail() {
     },
   });
 
+  const registrationQuery = useQuery({
+    queryKey: ["registration", user?.id, slug],
+    enabled: Boolean(user?.id && b?.id),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("registrations")
+        .select("*")
+        .eq("bootcamp_id", b!.id)
+        .eq("student_id", user!.id)
+        .limit(1);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const alreadyRegistered = !!registrationQuery.data?.length;
+
   const register = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Please sign in first");
+      if (alreadyRegistered) throw new Error("You are already registered for this bootcamp");
       const { error } = await supabase.from("registrations").insert({ bootcamp_id: b!.id, student_id: user.id });
       if (error) throw error;
     },
@@ -93,11 +111,17 @@ function BootcampDetail() {
                 </div>
                 {user ? (
                   <Button
-                    disabled={!canRegister || register.isPending}
+                    disabled={!canRegister || register.isPending || alreadyRegistered}
                     onClick={() => register.mutate()}
                     className="mt-6 w-full rounded-full bg-brand-gradient py-6 text-base font-semibold text-white shadow-lg shadow-primary/30 hover:opacity-90"
                   >
-                    {register.isPending ? "Reserving…" : canRegister ? "Reserve my seat" : "Registration closed"}
+                    {register.isPending
+                      ? "Reserving…"
+                      : alreadyRegistered
+                      ? "Already registered"
+                      : canRegister
+                      ? "Reserve my seat"
+                      : "Registration closed"}
                   </Button>
                 ) : (
                   <Link to="/auth" search={{ next: `/bootcamps/${b.slug}` }}>

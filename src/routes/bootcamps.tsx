@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -12,13 +12,20 @@ export const Route = createFileRoute("/bootcamps")({
       { title: "Bootcamps — Mira Edge Academy" },
       { name: "description", content: "Browse upcoming live cohorts in full-stack web development and AI-assisted engineering." },
       { property: "og:title", content: "Bootcamps — Mira Edge Academy" },
-      { property: "og:description", content: "Browse upcoming live cohorts." },
+      { property: "og:description", content: "Browse upcoming bootcamps." },
     ],
   }),
   component: BootcampsPage,
 });
 
 function BootcampsPage() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isBootcampsIndex = pathname === "/bootcamps";
+
+  if (!isBootcampsIndex) {
+    return <Outlet />;
+  }
+
   const { data, isLoading } = useQuery({
     queryKey: ["bootcamps-all"],
     queryFn: async () => {

@@ -193,8 +193,7 @@ export function BootcampCard({ b }: { b: any }) {
   const dLeft = daysUntil(b.registration_deadline);
   return (
     <Link
-      to="/bootcamps/$slug"
-      params={{ slug: b.slug }}
+      to={`/bootcamps/${b.slug}`}
       className="group card-elevated flex h-full flex-col overflow-hidden transition hover:-translate-y-1 hover:glow-primary"
     >
       <div className="relative h-40 overflow-hidden bg-brand-gradient">
@@ -214,9 +213,11 @@ export function BootcampCard({ b }: { b: any }) {
           <div className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5 text-primary" /> {b.start_date ?? "TBA"}</div>
           <div className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5 text-primary" /> {dLeft != null ? (dLeft > 0 ? `${dLeft}d to register` : "Closed") : "Open"}</div>
         </div>
-        <div className="mt-6 flex items-center justify-between border-t border-border/50 pt-4">
+        <div className="mt-6 flex flex-col gap-3 border-t border-border/50 pt-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="font-display text-xl font-bold text-brand-gradient">{formatXAF(b.price, b.currency)}</p>
-          <span className="text-xs font-medium text-primary">View more →</span>
+          <span className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-xs font-medium text-primary transition group-hover:bg-primary/10">
+            View details
+          </span>
         </div>
       </div>
     </Link>
