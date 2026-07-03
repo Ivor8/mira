@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -10,17 +10,21 @@ import { CheckCircle2, XCircle, ShieldCheck } from "lucide-react";
 import { format } from "date-fns";
 
 export const Route = createFileRoute("/certificate")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    code: typeof search.code === "string" ? search.code : "",
+  }),
   head: () => ({ meta: [{ title: "Verify certificate — Mira Edge Academy" }] }),
   component: Verify,
 });
 
 function Verify() {
-  const [code, setCode] = useState("");
+  const { code: initialCode } = Route.useSearch();
+  const [code, setCode] = useState(initialCode);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<any>(null);
 
-  const check = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const check = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     setBusy(true);
     const { data } = await supabase
       .from("certificates")
@@ -30,6 +34,11 @@ function Verify() {
     setBusy(false);
     setResult({ found: !!data, ...data });
   };
+
+  useEffect(() => {
+    if (initialCode) void check();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialCode]);
 
   return (
     <div className="min-h-screen bg-background">
