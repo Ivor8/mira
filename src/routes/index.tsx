@@ -196,10 +196,9 @@ export function BootcampCard({ b }: { b: any }) {
       to={`/bootcamps/${b.slug}`}
       className="group card-elevated flex h-full flex-col overflow-hidden transition hover:-translate-y-1 hover:glow-primary"
     >
-      <div className="relative h-40 overflow-hidden bg-brand-gradient">
-        <div className="absolute inset-0 opacity-30 bg-hero-grid" />
+      <div className="relative h-52 overflow-hidden bg-slate-950/5">
         {b.cover_image_url && (
-          <img src={b.cover_image_url} alt="" className="h-full w-full object-cover mix-blend-overlay" />
+          <img src={b.cover_image_url} alt="" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
         )}
         <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs text-white/90">
           <span className="rounded-full bg-black/30 px-2 py-1 backdrop-blur">{b.duration_weeks ?? 8} weeks</span>
