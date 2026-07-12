@@ -29,6 +29,8 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicSeedAdminRouteImport } from './routes/api/public/seed-admin'
+import { Route as ApiPaymentsStatusRouteImport } from './routes/api/payments/status'
+import { Route as ApiPaymentsInitiateRouteImport } from './routes/api/payments/initiate'
 import { Route as AuthenticatedDashboardSupportRouteImport } from './routes/_authenticated/dashboard.support'
 import { Route as AuthenticatedDashboardSessionsRouteImport } from './routes/_authenticated/dashboard.sessions'
 import { Route as AuthenticatedDashboardResourcesRouteImport } from './routes/_authenticated/dashboard.resources'
@@ -142,6 +144,16 @@ const ApiPublicSeedAdminRoute = ApiPublicSeedAdminRouteImport.update({
   path: '/api/public/seed-admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPaymentsStatusRoute = ApiPaymentsStatusRouteImport.update({
+  id: '/api/payments/status',
+  path: '/api/payments/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPaymentsInitiateRoute = ApiPaymentsInitiateRouteImport.update({
+  id: '/api/payments/initiate',
+  path: '/api/payments/initiate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardSupportRoute =
   AuthenticatedDashboardSupportRouteImport.update({
     id: '/support',
@@ -244,6 +256,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/resources': typeof AuthenticatedDashboardResourcesRoute
   '/dashboard/sessions': typeof AuthenticatedDashboardSessionsRoute
   '/dashboard/support': typeof AuthenticatedDashboardSupportRoute
+  '/api/payments/initiate': typeof ApiPaymentsInitiateRoute
+  '/api/payments/status': typeof ApiPaymentsStatusRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -275,6 +289,8 @@ export interface FileRoutesByTo {
   '/dashboard/resources': typeof AuthenticatedDashboardResourcesRoute
   '/dashboard/sessions': typeof AuthenticatedDashboardSessionsRoute
   '/dashboard/support': typeof AuthenticatedDashboardSupportRoute
+  '/api/payments/initiate': typeof ApiPaymentsInitiateRoute
+  '/api/payments/status': typeof ApiPaymentsStatusRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
@@ -310,6 +326,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/resources': typeof AuthenticatedDashboardResourcesRoute
   '/_authenticated/dashboard/sessions': typeof AuthenticatedDashboardSessionsRoute
   '/_authenticated/dashboard/support': typeof AuthenticatedDashboardSupportRoute
+  '/api/payments/initiate': typeof ApiPaymentsInitiateRoute
+  '/api/payments/status': typeof ApiPaymentsStatusRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -345,6 +363,8 @@ export interface FileRouteTypes {
     | '/dashboard/resources'
     | '/dashboard/sessions'
     | '/dashboard/support'
+    | '/api/payments/initiate'
+    | '/api/payments/status'
     | '/api/public/seed-admin'
     | '/admin/'
     | '/dashboard/'
@@ -376,6 +396,8 @@ export interface FileRouteTypes {
     | '/dashboard/resources'
     | '/dashboard/sessions'
     | '/dashboard/support'
+    | '/api/payments/initiate'
+    | '/api/payments/status'
     | '/api/public/seed-admin'
     | '/admin'
     | '/dashboard'
@@ -410,6 +432,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/resources'
     | '/_authenticated/dashboard/sessions'
     | '/_authenticated/dashboard/support'
+    | '/api/payments/initiate'
+    | '/api/payments/status'
     | '/api/public/seed-admin'
     | '/_authenticated/admin/'
     | '/_authenticated/dashboard/'
@@ -430,6 +454,8 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
+  ApiPaymentsInitiateRoute: typeof ApiPaymentsInitiateRoute
+  ApiPaymentsStatusRoute: typeof ApiPaymentsStatusRoute
   ApiPublicSeedAdminRoute: typeof ApiPublicSeedAdminRoute
 }
 
@@ -573,6 +599,20 @@ declare module '@tanstack/react-router' {
       path: '/api/public/seed-admin'
       fullPath: '/api/public/seed-admin'
       preLoaderRoute: typeof ApiPublicSeedAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/status': {
+      id: '/api/payments/status'
+      path: '/api/payments/status'
+      fullPath: '/api/payments/status'
+      preLoaderRoute: typeof ApiPaymentsStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payments/initiate': {
+      id: '/api/payments/initiate'
+      path: '/api/payments/initiate'
+      fullPath: '/api/payments/initiate'
+      preLoaderRoute: typeof ApiPaymentsInitiateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/support': {
@@ -753,6 +793,8 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
+  ApiPaymentsInitiateRoute: ApiPaymentsInitiateRoute,
+  ApiPaymentsStatusRoute: ApiPaymentsStatusRoute,
   ApiPublicSeedAdminRoute: ApiPublicSeedAdminRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,14 +1,19 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Calendar, Clock, Users, CheckCircle2, GraduationCap, Rocket, ChevronRight } from "lucide-react";
+import { Calendar, Clock, Users, CheckCircle2, GraduationCap, Rocket, ChevronRight, Loader2, Phone, Wallet } from "lucide-react";
 import { toast } from "sonner";
+import { useState, useEffect, useRef } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { formatXAF, daysUntil } from "@/lib/format";
 import { useAuthUser } from "@/hooks/useAuthUser";
+
 
 export const Route = createFileRoute("/bootcamps/$slug")({
   component: BootcampDetail,
@@ -18,6 +23,30 @@ function BootcampDetail() {
   const { slug } = Route.useParams();
   const navigate = useNavigate();
   const { user } = useAuthUser();
+  const qc = useQueryClient();
+
+  const [showPayModal, setShowPayModal] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [paymentProvider, setPaymentProvider] = useState<"mtn_momo" | "orange_money">("mtn_momo");
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "initiating" | "pending_pin" | "success" | "failed">("idle");
+  const [paymentError, setPaymentError] = useState("");
+  const [transactionId, setTransactionId] = useState("");
+
+  const pollIntervalRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (user?.phone) {
+      setPhoneNumber(user.phone);
+    }
+  }, [user?.phone]);
+
+  useEffect(() => {
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+    };
+  }, []);
 
   const { data: b, isLoading } = useQuery({
     queryKey: ["bootcamp", slug],
@@ -45,16 +74,81 @@ function BootcampDetail() {
 
   const alreadyRegistered = !!registrationQuery.data?.length;
 
-  const register = useMutation({
-    mutationFn: async () => {
-      if (!user) throw new Error("Please sign in first");
-      if (alreadyRegistered) throw new Error("You are already registered for this bootcamp");
-      const { error } = await supabase.from("registrations").insert({ bootcamp_id: b!.id, student_id: user.id });
-      if (error) throw error;
-    },
-    onSuccess: () => { toast.success("Seat reserved!"); navigate({ to: "/dashboard" }); },
-    onError: (e: any) => toast.error(e.message ?? "Could not register"),
-  });
+  const startStatusPolling = (transId: string) => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+    }
+
+    pollIntervalRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/payments/status?transId=${transId}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "Failed checking payment status");
+        }
+
+        if (data.status === "SUCCESSFUL") {
+          if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+          setPaymentStatus("success");
+          toast.success("Payment confirmed! Seat reserved successfully.");
+          registrationQuery.refetch();
+          qc.invalidateQueries({ queryKey: ["bootcamp", slug] });
+          qc.invalidateQueries({ queryKey: ["registration", user?.id, slug] });
+
+          setTimeout(() => {
+            setShowPayModal(false);
+            navigate({ to: "/dashboard" });
+          }, 2000);
+        } else if (data.status === "FAILED") {
+          if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+          setPaymentStatus("failed");
+          setPaymentError("The transaction failed or was canceled. Please ensure your account has sufficient funds and try again.");
+          toast.error("Payment failed. Please try again.");
+        }
+      } catch (err: any) {
+        console.error("Polling payment status error:", err);
+      }
+    }, 3000);
+  };
+
+  const handleInitiatePayment = async () => {
+    if (!phoneNumber.trim()) {
+      toast.error("Please enter your Mobile Money phone number");
+      return;
+    }
+    setPaymentStatus("initiating");
+    setPaymentError("");
+    setTransactionId("");
+
+    try {
+      const res = await fetch("/api/payments/initiate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: b!.price,
+          phone: phoneNumber.trim(),
+          provider: paymentProvider,
+          studentId: user!.id,
+          bootcampId: b!.id,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to initiate payment");
+      }
+
+      setTransactionId(data.transId);
+      setPaymentStatus("pending_pin");
+      toast.info("Payment request sent! Check your phone for verification prompt.");
+      startStatusPolling(data.transId);
+    } catch (err: any) {
+      setPaymentStatus("idle");
+      setPaymentError(err.message || "Failed to initiate payment. Please try again.");
+      toast.error(err.message || "Could not initiate payment");
+    }
+  };
 
   if (isLoading) return <div className="min-h-screen bg-background"><SiteHeader /><div className="mx-auto max-w-7xl p-24 text-center text-muted-foreground">Loading…</div></div>;
   if (!b) return (
@@ -111,13 +205,16 @@ function BootcampDetail() {
                 </div>
                 {user ? (
                   <Button
-                    disabled={!canRegister || register.isPending || alreadyRegistered}
-                    onClick={() => register.mutate()}
+                    disabled={!canRegister || alreadyRegistered}
+                    onClick={() => {
+                      setPaymentStatus("idle");
+                      setPaymentError("");
+                      setTransactionId("");
+                      setShowPayModal(true);
+                    }}
                     className="mt-6 w-full rounded-full bg-brand-gradient py-6 text-base font-semibold text-white shadow-lg shadow-primary/30 hover:opacity-90"
                   >
-                    {register.isPending
-                      ? "Reserving…"
-                      : alreadyRegistered
+                    {alreadyRegistered
                       ? "Already registered"
                       : canRegister
                       ? "Reserve my seat"
@@ -217,6 +314,160 @@ function BootcampDetail() {
             </aside>
           </div>
         </section>
+
+        <Dialog open={showPayModal} onOpenChange={(open) => {
+          if (paymentStatus === "initiating" || paymentStatus === "pending_pin") return;
+          setShowPayModal(open);
+        }}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="font-display text-2xl font-bold">Bootcamp Registration</DialogTitle>
+              <DialogDescription>
+                To reserve your seat for <strong>{b.title}</strong>, please complete your payment.
+              </DialogDescription>
+            </DialogHeader>
+
+            {paymentStatus === "idle" && (
+              <div className="space-y-6 py-4">
+                <div className="rounded-2xl bg-amber-500/10 border border-amber-500/20 p-4 text-sm text-yellow-600/90 dark:text-yellow-500 flex items-start gap-3">
+                  <Wallet className="h-5 w-5 shrink-0 text-amber-500 mt-0.5" />
+                  <div>
+                    <span className="font-semibold block mb-0.5">Secure payment required</span>
+                    Mobile money transaction will consume {formatXAF(b.price, b.currency)} immediately to confirm reservation.
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="provider">Mobile Money Network</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setPaymentProvider("mtn_momo")}
+                        className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                          paymentProvider === "mtn_momo"
+                            ? "border-primary bg-primary/5 text-primary"
+                            : "border-border hover:border-border/80"
+                        }`}
+                      >
+                        <span className="font-bold text-sm tracking-wider">MTN MoMo</span>
+                        <span className="text-[10px] text-muted-foreground mt-0.5">Yellow Card</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentProvider("orange_money")}
+                        className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                          paymentProvider === "orange_money"
+                            ? "border-orange-500 bg-orange-500/5 text-orange-500"
+                            : "border-border hover:border-orange-500/80"
+                        }`}
+                      >
+                        <span className="font-bold text-sm tracking-wider">Orange Money</span>
+                        <span className="text-[10px] text-muted-foreground mt-0.5">Orange Card</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Mobile Money Number</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-2.5 text-sm text-muted-foreground font-semibold">+237</span>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="670000000"
+                        className="pl-14 rounded-xl h-11 text-base font-medium tracking-wide"
+                        maxLength={9}
+                      />
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">Enter 9 digits Cameroon number (e.g. 6xxxxxxxx).</p>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleInitiatePayment}
+                  className="w-full bg-brand-gradient hover:opacity-95 text-white font-semibold rounded-xl h-12 text-sm shadow-md"
+                >
+                  Pay {formatXAF(b.price, b.currency)} & Register
+                </Button>
+              </div>
+            )}
+
+            {paymentStatus === "initiating" && (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Loader2 className="h-10 w-10 text-primary animate-spin" />
+                <p className="mt-4 font-semibold text-lg animate-pulse">Initializing Payment...</p>
+                <p className="mt-1 text-sm text-muted-foreground max-w-[280px]">Contacting payment gateway. Please hold on.</p>
+              </div>
+            )}
+
+            {paymentStatus === "pending_pin" && (
+              <div className="flex flex-col items-center justify-center py-8 text-center space-y-4">
+                <div className="relative flex items-center justify-center">
+                  <div className="h-14 w-14 rounded-full border-4 border-primary border-t-transparent animate-spin flex items-center justify-center" />
+                  <Loader2 className="h-6 w-6 absolute text-primary animate-pulse" />
+                </div>
+                <div>
+                  <p className="font-bold text-lg">Check Your Phone!</p>
+                  <p className="mt-2 text-sm text-muted-foreground max-w-[300px]">
+                    We've sent a Mobile Money payment prompt to <strong>+237 {phoneNumber}</strong>.
+                  </p>
+                  <p className="mt-3 text-xs font-semibold px-4 py-2 border rounded-full bg-secondary bg-opacity-40 inline-block text-secondary-foreground">
+                    Ref ID: {transactionId || "..."}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-primary/10 border border-primary/20 p-3 text-xs text-primary max-w-[320px] text-left">
+                  <span className="font-semibold block mb-0.5">Prompt Not Showing?</span>
+                  Dial MTN <strong>*126#</strong> or Orange <strong>#150#</strong> to authorize pending transactions if the push alert does not appear automatically.
+                </div>
+              </div>
+            )}
+
+            {paymentStatus === "success" && (
+              <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+                <div className="h-16 w-16 bg-green-500/10 rounded-full flex items-center justify-center border border-green-500/20">
+                  <CheckCircle2 className="h-10 w-10 text-green-500 animate-bounce" />
+                </div>
+                <div>
+                  <p className="font-bold text-xl text-green-600 dark:text-green-500">Payment Confirmed!</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Your seat has been reserved and your registration is confirmed.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Redirecting you to dashboard...</p>
+                </div>
+              </div>
+            )}
+
+            {paymentStatus === "failed" && (
+              <div className="flex flex-col items-center justify-center py-8 text-center space-y-5">
+                <div className="h-14 w-14 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20">
+                  <span className="text-red-500 text-3xl font-extrabold">!</span>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-bold text-lg text-red-500">Payment Failed</p>
+                  <p className="text-sm text-muted-foreground max-w-[280px]">
+                    {paymentError}
+                  </p>
+                </div>
+                <div className="flex w-full gap-3 pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowPayModal(false)}
+                    className="flex-1 rounded-xl"
+                  >
+                    Close
+                  </Button>
+                  <Button
+                    onClick={() => setPaymentStatus("idle")}
+                    className="flex-1 bg-brand-gradient text-white rounded-xl"
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
       <SiteFooter />
     </div>
