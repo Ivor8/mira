@@ -74,17 +74,22 @@ function createNoopQueryBuilder(): StubQueryBuilder {
 
 function createSupabaseClient() {
   // Use import.meta.env for client-side (Vite build-time replacement)
-  // Fall back to process.env for SSR and build-time injection.
+  // Fall back to process.env for SSR and build-time injection, but guard it because
+  // the browser bundle may not have a global process object.
+  const runtimeProcessEnv = typeof process !== 'undefined' ? process.env : undefined;
+
   const SUPABASE_URL =
     import.meta.env.VITE_SUPABASE_URL ||
     import.meta.env.SUPABASE_URL ||
-    process.env.VITE_SUPABASE_URL ||
-    process.env.SUPABASE_URL;
+    runtimeProcessEnv?.VITE_SUPABASE_URL ||
+    runtimeProcessEnv?.SUPABASE_URL ||
+    '';
   const SUPABASE_PUBLISHABLE_KEY =
     import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
     import.meta.env.SUPABASE_PUBLISHABLE_KEY ||
-    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.SUPABASE_PUBLISHABLE_KEY;
+    runtimeProcessEnv?.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    runtimeProcessEnv?.SUPABASE_PUBLISHABLE_KEY ||
+    '';
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     console.warn('[Supabase] Missing configuration. Falling back to a no-op client so the site can render without crashing.');
