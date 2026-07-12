@@ -10,7 +10,7 @@ import { t as Route$31 } from "./auth-Bpb16ABY.mjs";
 import { n as Route$32 } from "./routes-BGxe_4wa.mjs";
 import { t as Route$33 } from "./bootcamps._slug-BZwUyNhu.mjs";
 import { t as Route$34 } from "./certificate-BnV5_pj-.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/router-CSVwgbLh.js
+//#region node_modules/.nitro/vite/services/ssr/assets/router-C60QVJQr.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var styles_default = "/assets/styles-DhZvj8Og.css";
@@ -520,7 +520,7 @@ var Route$12 = createFileRoute("/api/payments/initiate")({ server: { handlers: {
 		const FAPSHI_API_KEY = process.env.FAPSHI_API_KEY;
 		const FAPSHI_BASE_URL = process.env.FAPSHI_BASE_URL || "https://sandbox.fapshi.com";
 		const isMockMode = !FAPSHI_API_USER || !FAPSHI_API_KEY || FAPSHI_API_USER === "YOUR_FAPSHI_API_USER" || FAPSHI_API_KEY === "YOUR_FAPSHI_API_KEY";
-		const medium = provider === "mtn_momo" ? "MTN" : "ORANGE";
+		const medium = provider === "mtn_momo" ? "mobile money" : "orange money";
 		let cleanedPhone = phone.replace(/\D/g, "");
 		if (cleanedPhone.length > 9) cleanedPhone = cleanedPhone.slice(-9);
 		if (cleanedPhone.length !== 9 || !["6"].includes(cleanedPhone[0])) return new Response(JSON.stringify({ error: "Invalid Cameroon mobile network number. Must be 9 digits (e.g., 67xxxxxxx or 69xxxxxxx)" }), {
