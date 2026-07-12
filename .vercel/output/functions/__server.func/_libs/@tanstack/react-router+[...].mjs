@@ -1,7 +1,7 @@
 import { i as __require, o as __toESM, t as __commonJSMin } from "../../_runtime.mjs";
-import { y as require_jsx_runtime } from "../@radix-ui/react-accordion+[...].mjs";
 import { l as require_react_dom, u as require_react } from "../@floating-ui/react-dom+[...].mjs";
 import { r as parseHref } from "../tanstack__history.mjs";
+import { y as require_jsx_runtime } from "../@radix-ui/react-accordion+[...].mjs";
 import { PassThrough, Readable } from "node:stream";
 import { ReadableStream as ReadableStream$1 } from "node:stream/web";
 //#region node_modules/@tanstack/react-router/dist/esm/utils.js
@@ -1354,7 +1354,6 @@ function isNotFound(obj) {
 }
 //#endregion
 //#region node_modules/@tanstack/router-core/dist/esm/qss.js
-var import_jsx_runtime = require_jsx_runtime();
 /**
 * Program is a reimplementation of the `qss` package:
 * Copyright (c) Luke Edwards luke.edwards05@gmail.com, MIT License
@@ -1520,11 +1519,6 @@ function redirect(opts) {
 /** Check whether a value is a TanStack Router redirect Response. */
 function isRedirect(obj) {
 	return obj instanceof Response && !!obj.options;
-}
-/** True if value is a redirect with a resolved `href` location. */
-/** True if value is a redirect with a resolved `href` location. */
-function isResolvedRedirect(obj) {
-	return isRedirect(obj) && !!obj.options.href;
 }
 //#endregion
 //#region node_modules/@tanstack/router-core/dist/esm/load-matches.js
@@ -3532,24 +3526,12 @@ function appendUniqueUserTags(target, tags) {
 		target.push(tag);
 	}
 }
-function getStylesheetHref(asset) {
-	return resolveManifestCssLink(asset).href;
-}
 function resolveManifestCssLink(link) {
 	if (typeof link === "string") return {
 		href: link,
 		crossOrigin: void 0
 	};
 	return link;
-}
-function createInlineCssStyleAsset(css) {
-	return {
-		attrs: { suppressHydrationWarning: true },
-		children: css
-	};
-}
-function createInlineCssPlaceholderAsset() {
-	return { attrs: { suppressHydrationWarning: true } };
 }
 //#endregion
 //#region node_modules/@tanstack/router-core/dist/esm/route.js
@@ -3624,11 +3606,8 @@ var BaseRootRoute = class extends BaseRoute {
 	}
 };
 //#endregion
-//#region node_modules/@tanstack/router-core/dist/esm/ssr/constants.js
-var GLOBAL_TSR = "$_TSR";
-var TSR_SCRIPT_BARRIER_ID = "$tsr-stream-barrier";
-//#endregion
 //#region node_modules/@tanstack/react-router/dist/esm/CatchBoundary.js
+var import_jsx_runtime = require_jsx_runtime();
 function CatchBoundary(props) {
 	const errorComponent = props.errorComponent ?? ErrorComponent;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CatchBoundaryImpl, {
@@ -13787,15 +13766,6 @@ var require_server_node = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 //#endregion
 //#region node_modules/@tanstack/router-core/dist/esm/ssr/handlerCallback.js
-function isSsrResponse(value) {
-	return typeof value === "object" && value !== null && "response" in value && "serverSsrCleanup" in value;
-}
-function normalizeSsrResponse(result) {
-	return isSsrResponse(result) ? result : {
-		response: result,
-		serverSsrCleanup: "none"
-	};
-}
 function createSsrStreamResponse(router, response) {
 	if (!response.body) throw new Error("Invariant failed: SSR stream response requires a body");
 	let disposed = false;
@@ -13810,22 +13780,6 @@ function createSsrStreamResponse(router, response) {
 			} catch {}
 			router.serverSsr?.cleanup();
 		}
-	};
-}
-async function replaceSsrResponse(result, response, reason) {
-	const ssrResponse = normalizeSsrResponse(result);
-	if (ssrResponse.serverSsrCleanup === "stream") await ssrResponse.dispose(reason);
-	return {
-		response,
-		serverSsrCleanup: "none"
-	};
-}
-async function stripSsrResponseBody(result, reason) {
-	const ssrResponse = normalizeSsrResponse(result);
-	if (ssrResponse.serverSsrCleanup === "stream") await ssrResponse.dispose(reason);
-	return {
-		response: new Response(null, ssrResponse.response),
-		serverSsrCleanup: "none"
 	};
 }
 function defineHandlerCallback(handler) {
@@ -14524,4 +14478,4 @@ var renderRouterToStream = async ({ request, router, responseHeaders, children }
 	throw new Error("No renderToReadableStream or renderToPipeableStream found in react-dom/server. Ensure you are using a version of react-dom that supports streaming.");
 };
 //#endregion
-export { redirect as A, getScriptPreloadAttrs as C, executeRewriteInput as D, resolveManifestCssLink as E, decodePath as F, isNotFound as M, createLRUCache as N, isRedirect as O, invariant as P, createInlineCssStyleAsset as S, resolveManifestAssetLink as T, useNavigate as _, replaceSsrResponse as a, TSR_SCRIPT_BARRIER_ID as b, HeadContent as c, createRouter as d, Outlet as f, Link as g, createRootRouteWithContext as h, normalizeSsrResponse as i, rootRouteId as j, isResolvedRedirect as k, useRouterState as l, createFileRoute as m, defineHandlerCallback as n, stripSsrResponseBody as o, lazyRouteComponent as p, isSsrResponse as r, Scripts as s, renderRouterToStream as t, RouterProvider as u, useRouter as v, getStylesheetHref as w, createInlineCssPlaceholderAsset as x, GLOBAL_TSR as y };
+export { useRouterState as a, Outlet as c, createRootRouteWithContext as d, Link as f, redirect as h, HeadContent as i, lazyRouteComponent as l, useRouter as m, defineHandlerCallback as n, RouterProvider as o, useNavigate as p, Scripts as r, createRouter as s, renderRouterToStream as t, createFileRoute as u };

@@ -1,6 +1,6 @@
 import { o as __toESM } from "../../_runtime.mjs";
-import { _ as createSlot, c as Presence, d as useControllableState, h as createContextScope, l as Primitive, m as useLayoutEffect2, o as useDirection, p as useId, s as createCollection, v as useComposedRefs, y as require_jsx_runtime } from "./react-accordion+[...].mjs";
 import { l as require_react_dom, u as require_react } from "../@floating-ui/react-dom+[...].mjs";
+import { _ as createSlot, c as Presence, d as useLayoutEffect2, f as createCollection, l as useControllableState, m as Primitive, o as useDirection, p as createContextScope, s as useId, v as useComposedRefs, y as require_jsx_runtime } from "./react-accordion+[...].mjs";
 import { t as composeEventHandlers } from "../radix-ui__primitive.mjs";
 import { c as hideOthers, d as Portal, f as FocusScope, l as ReactRemoveScroll, m as useCallbackRef, p as DismissableLayer, u as useFocusGuards } from "./react-dialog+[...].mjs";
 import { t as clamp } from "../radix-ui__number.mjs";

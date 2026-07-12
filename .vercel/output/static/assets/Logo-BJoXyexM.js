@@ -1,1 +1,0 @@
-import{o as e}from"./useStore-Ba-e3RKH.js";var t=e();function n({className:e=`h-8 w-8`}){return(0,t.jsx)(`img`,{src:`/logo.jpeg`,alt:`Mira Edge Academy logo`,className:e,loading:`lazy`})}export{n as t};
