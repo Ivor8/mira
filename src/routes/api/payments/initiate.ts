@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/payments/initiate")({
           const isMockMode = !FAPSHI_API_USER || !FAPSHI_API_KEY || FAPSHI_API_USER === "YOUR_FAPSHI_API_USER" || FAPSHI_API_KEY === "YOUR_FAPSHI_API_KEY";
 
           // Map provider to Fapshi medium format (MTN or ORANGE)
-          const medium = provider === "mtn_momo" ? "MTN" : "ORANGE";
+          const medium = provider === "mtn_momo" ? "mobile money" : "orange money";
 
           // Parse phone number: Fapshi expects standard Cameroon phone format (usually starting with 6, e.g. 670000000)
           // Clean the input to grab the last 9 digits of a Cameroon number if it has country code
