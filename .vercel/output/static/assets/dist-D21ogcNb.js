@@ -1,1 +1,0 @@
-import{G as e,X as t}from"./useStore-Ba-e3RKH.js";var n=t(e(),1);function r(e){let t=n.useRef(e);return n.useEffect(()=>{t.current=e}),n.useMemo(()=>((...e)=>t.current?.(...e)),[])}export{r as t};

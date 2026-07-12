@@ -1,16 +1,52 @@
 import { o as __toESM } from "../_runtime.mjs";
 import { t as supabase } from "./client-CTJdFVPM.mjs";
-import { y as require_jsx_runtime } from "../_libs/@radix-ui/react-accordion+[...].mjs";
-import { t as Logo } from "./Logo-f4TzIa2S.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
-import { t as useAuthUser } from "./useAuthUser-DHoxW5X_.mjs";
-import { t as Button } from "./button-BpE9Czok.mjs";
-import { g as Link } from "../_libs/@tanstack/react-router+[...].mjs";
-import { E as Github, _ as MessageCircle, b as Mail, h as Moon, l as Sun, n as X, v as Menu } from "../_libs/lucide-react.mjs";
+import { f as Link } from "../_libs/@tanstack/react-router+[...].mjs";
+import { g as Slot, y as require_jsx_runtime } from "../_libs/@radix-ui/react-accordion+[...].mjs";
 import { t as motion } from "../_libs/framer-motion.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/SiteFooter-B8AmoCCx.js
+import { E as Github, _ as MessageCircle, b as Mail, h as Moon, l as Sun, n as X, v as Menu } from "../_libs/lucide-react.mjs";
+import { n as clsx, t as cva } from "../_libs/class-variance-authority+clsx.mjs";
+import { t as twMerge } from "../_libs/tailwind-merge.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/format-BsBIdMp6.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
+function useAuthUser() {
+	const [user, setUser] = (0, import_react.useState)(null);
+	const [roles, setRoles] = (0, import_react.useState)([]);
+	const [loading, setLoading] = (0, import_react.useState)(true);
+	(0, import_react.useEffect)(() => {
+		let mounted = true;
+		const load = async (u) => {
+			if (!u) {
+				if (mounted) {
+					setUser(null);
+					setRoles([]);
+					setLoading(false);
+				}
+				return;
+			}
+			const { data } = await supabase.from("user_roles").select("role").eq("user_id", u.id);
+			if (!mounted) return;
+			setUser(u);
+			setRoles((data ?? []).map((r) => r.role));
+			setLoading(false);
+		};
+		supabase.auth.getUser().then(({ data }) => load(data.user));
+		const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+			load(session?.user ?? null);
+		});
+		return () => {
+			mounted = false;
+			sub.subscription.unsubscribe();
+		};
+	}, []);
+	return {
+		user,
+		roles,
+		isAdmin: roles.includes("admin") || roles.includes("super_admin"),
+		loading
+	};
+}
 function useTheme() {
 	const [theme, setThemeState] = (0, import_react.useState)("dark");
 	(0, import_react.useEffect)(() => {
@@ -29,6 +65,51 @@ function useTheme() {
 		toggle: () => setTheme(theme === "dark" ? "light" : "dark")
 	};
 }
+function Logo({ className = "h-8 w-8" }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+		src: "/logo.jpeg",
+		alt: "Mira Edge Academy logo",
+		className,
+		loading: "lazy"
+	});
+}
+function cn(...inputs) {
+	return twMerge(clsx(inputs));
+}
+var buttonVariants = cva("inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", {
+	variants: {
+		variant: {
+			default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+			destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+			outline: "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+			secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
+			ghost: "hover:bg-accent hover:text-accent-foreground",
+			link: "text-primary underline-offset-4 hover:underline"
+		},
+		size: {
+			default: "h-9 px-4 py-2",
+			sm: "h-8 rounded-md px-3 text-xs",
+			lg: "h-10 rounded-md px-8",
+			icon: "h-9 w-9"
+		}
+	},
+	defaultVariants: {
+		variant: "default",
+		size: "default"
+	}
+});
+var Button = import_react.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(asChild ? Slot : "button", {
+		className: cn(buttonVariants({
+			variant,
+			size,
+			className
+		})),
+		ref,
+		...props
+	});
+});
+Button.displayName = "Button";
 var NAV = [
 	{
 		to: "/",
@@ -345,5 +426,15 @@ function SiteFooter() {
 		})
 	});
 }
+function formatXAF(amount, currency = "XAF") {
+	const n = typeof amount === "string" ? Number(amount) : amount;
+	if (!Number.isFinite(n)) return `${currency} 0`;
+	return `${currency} ${new Intl.NumberFormat("en-US").format(Math.round(n))}`;
+}
+function daysUntil(date) {
+	if (!date) return null;
+	const ms = new Date(date).getTime() - Date.now();
+	return Math.ceil(ms / (1e3 * 60 * 60 * 24));
+}
 //#endregion
-export { SiteFooter as n, SiteHeader as r, BRAND as t };
+export { SiteHeader as a, formatXAF as c, SiteFooter as i, useAuthUser as l, Button as n, cn as o, Logo as r, daysUntil as s, BRAND as t };

@@ -1,13 +1,11 @@
 import { t as supabase } from "./client-CTJdFVPM.mjs";
+import { f as Link } from "../_libs/@tanstack/react-router+[...].mjs";
 import { y as require_jsx_runtime } from "../_libs/@radix-ui/react-accordion+[...].mjs";
-import { t as Button } from "./button-BpE9Czok.mjs";
-import { g as Link } from "../_libs/@tanstack/react-router+[...].mjs";
-import { G as Award, I as CirclePlay, K as ArrowRight, L as CircleCheck, M as CodeXml, N as Clock, T as GraduationCap, U as Calendar, a as Users, f as Rocket, t as Zap, u as Sparkles } from "../_libs/lucide-react.mjs";
 import { t as motion } from "../_libs/framer-motion.mjs";
-import { n as SiteFooter, r as SiteHeader, t as BRAND } from "./SiteFooter-B8AmoCCx.mjs";
-import { n as formatXAF, t as daysUntil } from "./format-LeLbyl3U.mjs";
+import { G as Award, I as CirclePlay, K as ArrowRight, L as CircleCheck, M as CodeXml, N as Clock, T as GraduationCap, U as Calendar, a as Users, f as Rocket, t as Zap, u as Sparkles } from "../_libs/lucide-react.mjs";
+import { a as SiteHeader, c as formatXAF, i as SiteFooter, n as Button, s as daysUntil, t as BRAND } from "./format-BsBIdMp6.mjs";
 import { n as useQuery } from "../_libs/tanstack__react-query.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/routes-DMdC2udT.js
+//#region node_modules/.nitro/vite/services/ssr/assets/routes-N6ZQMexN.js
 var import_jsx_runtime = require_jsx_runtime();
 var fadeUp = {
 	initial: {
