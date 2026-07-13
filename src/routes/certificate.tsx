@@ -26,13 +26,24 @@ function Verify() {
   const check = async (e?: React.FormEvent) => {
     e?.preventDefault();
     setBusy(true);
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("certificates")
-      .select("certificate_code, issued_at, bootcamp:bootcamps(title), student:profiles(full_name)")
+      .select("certificate_code, issued_at, bootcamp:bootcamps(title), student_id")
       .eq("certificate_code", code.trim().toUpperCase())
       .maybeSingle();
+    if (error) throw error;
+    let student = null;
+    if (data?.student_id) {
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", data.student_id)
+        .maybeSingle();
+      if (profileError) throw profileError;
+      student = profile;
+    }
     setBusy(false);
-    setResult({ found: !!data, ...data });
+    setResult({ found: !!data, ...data, student });
   };
 
   useEffect(() => {

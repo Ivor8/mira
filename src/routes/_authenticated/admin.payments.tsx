@@ -46,10 +46,19 @@ function AdminPayments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("payments")
-        .select("*, bootcamp:bootcamps(title), student:profiles(full_name)")
+        .select("*, bootcamp:bootcamps(title)")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      const payments = data ?? [];
+      const studentIds = Array.from(new Set(payments.map((p: any) => p.student_id).filter(Boolean)));
+      if (studentIds.length === 0) return payments;
+      const { data: students, error: studentError } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", studentIds);
+      if (studentError) throw studentError;
+      const studentMap = new Map((students ?? []).map((s: any) => [s.id, s]));
+      return payments.map((p: any) => ({ ...p, student: studentMap.get(p.student_id) ?? null }));
     },
   });
 

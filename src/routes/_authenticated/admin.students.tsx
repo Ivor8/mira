@@ -43,10 +43,19 @@ function AdminStudents() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("registrations")
-        .select("*, bootcamp:bootcamps(title), student:profiles(full_name, phone)")
+        .select("*, bootcamp:bootcamps(title)")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      const registrations = data ?? [];
+      const studentIds = Array.from(new Set(registrations.map((r: any) => r.student_id).filter(Boolean)));
+      if (studentIds.length === 0) return registrations;
+      const { data: students, error: studentError } = await supabase
+        .from("profiles")
+        .select("id, full_name, phone")
+        .in("id", studentIds);
+      if (studentError) throw studentError;
+      const studentMap = new Map((students ?? []).map((s: any) => [s.id, s]));
+      return registrations.map((r: any) => ({ ...r, student: studentMap.get(r.student_id) ?? null }));
     },
   });
 
@@ -55,10 +64,19 @@ function AdminStudents() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("support_tickets")
-        .select("*, user:profiles(full_name)")
+        .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      const tickets = data ?? [];
+      const userIds = Array.from(new Set(tickets.map((t: any) => t.user_id).filter(Boolean)));
+      if (userIds.length === 0) return tickets;
+      const { data: users, error: userError } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+      if (userError) throw userError;
+      const userMap = new Map((users ?? []).map((u: any) => [u.id, u]));
+      return tickets.map((t: any) => ({ ...t, user: userMap.get(t.user_id) ?? null }));
     },
   });
 

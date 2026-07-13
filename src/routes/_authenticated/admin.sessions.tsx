@@ -83,10 +83,23 @@ function AdminSessions() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("attendance")
-        .select("session_id, student_id, joined_at, session:sessions(title, session_date), student:profiles(full_name)");
+        .select("session_id, student_id, joined_at, session:sessions(title, session_date)");
       if (error) throw error;
-      const bySession = new Map<string, { title: string; date: string; count: number; rows: typeof data }>();
-      for (const row of data ?? []) {
+      const attendance = data ?? [];
+      const studentIds = Array.from(new Set(attendance.map((r: any) => r.student_id).filter(Boolean)));
+      const studentMap = new Map<string, any>();
+      if (studentIds.length > 0) {
+        const { data: users, error: userError } = await supabase
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", studentIds);
+        if (userError) throw userError;
+        for (const user of users ?? []) {
+          studentMap.set(user.id, user);
+        }
+      }
+      const bySession = new Map<string, { title: string; date: string; count: number; rows: typeof attendance }>();
+      for (const row of attendance) {
         const sid = row.session_id;
         const existing = bySession.get(sid) ?? {
           title: (row.session as any)?.title ?? "Session",
@@ -94,8 +107,9 @@ function AdminSessions() {
           count: 0,
           rows: [],
         };
+        const rowWithStudent = { ...row, student: studentMap.get(row.student_id) ?? null };
         existing.count += 1;
-        existing.rows.push(row);
+        existing.rows.push(rowWithStudent);
         bySession.set(sid, existing);
       }
       return [...bySession.entries()].map(([id, v]) => ({ id, ...v }));
