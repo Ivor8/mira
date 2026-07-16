@@ -4,10 +4,12 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useLocation,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { FaWhatsapp } from "react-icons/fa";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -104,9 +106,17 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function shouldShowFloatingContact(pathname: string) {
+  if (!pathname) return false;
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/api") || pathname.includes("/_authenticated")) return false;
+  return true;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const location = useLocation();
+  const showFloatingContact = shouldShowFloatingContact(location.pathname);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
@@ -120,6 +130,20 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      {showFloatingContact && (
+        <a
+          href="https://wa.me/237676514428?text=Hello%20Mira%20Edge%20Academy%2C%20I%20would%20like%20to%20talk%20to%20a%20team%20member."
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Contact us on WhatsApp"
+          className="group fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 transition-all duration-200 hover:scale-105 hover:bg-[#1ebe57]"
+        >
+          <FaWhatsapp className="h-5 w-5" />
+          <span className="max-w-0 overflow-hidden opacity-0 transition-all duration-200 group-hover:max-w-[120px] group-hover:opacity-100">
+            Contact us
+          </span>
+        </a>
+      )}
       <Toaster />
     </QueryClientProvider>
   );
