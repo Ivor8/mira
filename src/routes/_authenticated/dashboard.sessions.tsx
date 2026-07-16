@@ -60,6 +60,19 @@ function StudentSessions() {
 
   const upcoming = (sessions ?? []).filter((s) => s.session_date >= new Date().toISOString().slice(0, 10));
   const past = (sessions ?? []).filter((s) => s.session_date < new Date().toISOString().slice(0, 10));
+  // Classify sessions by whether their end datetime has passed.
+  const now = new Date();
+  const endsBeforeNow = (s: any) => {
+    const date = s.session_date;
+    const end = s.end_time ?? s.start_time ?? "00:00";
+    // Construct an ISO-like local datetime string. If times include seconds, keep them.
+    const dateTimeStr = `${date}T${end}`;
+    const endDate = new Date(dateTimeStr);
+    return endDate < now;
+  };
+
+  const upcomingByTime = (sessions ?? []).filter((s) => !endsBeforeNow(s));
+  const pastByTime = (sessions ?? []).filter((s) => endsBeforeNow(s));
 
   return (
     <AppShell mode="student">
@@ -74,11 +87,11 @@ function StudentSessions() {
         </div>
       )}
 
-      {upcoming.length > 0 && (
+      {upcomingByTime.length > 0 && (
         <section className="mt-8">
           <h2 className="font-display text-xl font-bold">Upcoming</h2>
           <div className="mt-4 space-y-3">
-            {upcoming.map((s) => (
+            {upcomingByTime.map((s) => (
               <SessionRow
                 key={s.id}
                 session={s}
@@ -91,11 +104,11 @@ function StudentSessions() {
         </section>
       )}
 
-      {past.length > 0 && (
+      {pastByTime.length > 0 && (
         <section className="mt-10">
           <h2 className="font-display text-xl font-bold">Past sessions</h2>
           <div className="mt-4 space-y-3">
-            {past.map((s) => (
+            {pastByTime.map((s) => (
               <SessionRow key={s.id} session={s} attended={attendance?.has(s.id)} past />
             ))}
           </div>
@@ -119,7 +132,7 @@ function SessionRow({
   past?: boolean;
 }) {
   return (
-    <div className="card-elevated flex flex-wrap items-center justify-between gap-4 p-5">
+    <div className={"card-elevated flex flex-wrap items-center justify-between gap-4 p-5" + (past ? " opacity-70" : "")}>
       <div className="flex items-start gap-4">
         <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-gradient text-white">
           <Video className="h-5 w-5" />
@@ -133,6 +146,7 @@ function SessionRow({
           <div className="mt-2 flex gap-2">
             <StatusBadge status={s.status} />
             {attended && <StatusBadge status="completed" />}
+            {past && <StatusBadge status="past" />}
           </div>
         </div>
       </div>

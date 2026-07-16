@@ -45,7 +45,61 @@ const emptyForm = (): Partial<Bootcamp> => ({
   start_date: "",
   end_date: "",
   registration_deadline: "",
+  curriculum: "",
+  benefits: "",
+  requirements: "",
+  projects: "",
+  faqs: "",
 });
+
+function listToText(list?: any[]) {
+  return (list ?? []).map((item) => {
+    if (!item) return "";
+    if (typeof item === "string") return item;
+    if (typeof item === "object") return item.title ?? item.q ?? item.question ?? JSON.stringify(item);
+    return String(item);
+  }).filter(Boolean).join("\n");
+}
+
+function parseListText(value: string) {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function faqListToText(list?: any[]) {
+  return (list ?? []).map((item) => {
+    if (!item) return "";
+    if (typeof item === "string") return item;
+    const q = item.q ?? item.question ?? "";
+    const a = item.a ?? item.answer ?? "";
+    return `${q}${q && a ? " | " : ""}${a}`;
+  }).filter(Boolean).join("\n");
+}
+
+function parseFaqText(value: string) {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [question, answer] = line.split("|").map((part) => part.trim());
+      return { q: question, a: answer ?? "" };
+    });
+}
+
+function safeListValue(value?: any): any[] {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") return parseListText(value);
+  return [];
+}
+
+function safeFaqValue(value?: any): any[] {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") return parseFaqText(value);
+  return [];
+}
 
 function AdminBootcampsPage() {
   return (
@@ -75,7 +129,7 @@ function AdminBootcamps() {
     mutationFn: async () => {
       if (!form.title?.trim()) throw new Error("Title is required");
       const slug = form.slug?.trim() || slugify(form.title);
-      const payload = {
+      const basePayload = {
         title: form.title.trim(),
         slug,
         short_description: form.short_description?.trim() || null,
@@ -89,13 +143,17 @@ function AdminBootcamps() {
         start_date: form.start_date || null,
         end_date: form.end_date || null,
         registration_deadline: form.registration_deadline || null,
-        created_by: user?.id ?? null,
+        curriculum: safeListValue(form.curriculum),
+        benefits: safeListValue(form.benefits),
+        requirements: safeListValue(form.requirements),
+        projects: safeListValue(form.projects),
+        faqs: safeFaqValue(form.faqs),
       };
       if (editing) {
-        const { error } = await supabase.from("bootcamps").update(payload).eq("id", editing.id);
+        const { error } = await supabase.from("bootcamps").update(basePayload).eq("id", editing.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("bootcamps").insert(payload);
+        const { error } = await supabase.from("bootcamps").insert({ ...basePayload, created_by: user?.id ?? null });
         if (error) throw error;
       }
     },
@@ -129,7 +187,14 @@ function AdminBootcamps() {
 
   const openEdit = (b: Bootcamp) => {
     setEditing(b);
-    setForm({ ...b });
+    setForm({
+      ...b,
+      curriculum: listToText(b.curriculum as any[]),
+      benefits: listToText(b.benefits as any[]),
+      requirements: listToText(b.requirements as any[]),
+      projects: listToText(b.projects as any[]),
+      faqs: faqListToText(b.faqs as any[]),
+    });
     setOpen(true);
   };
 
@@ -233,6 +298,26 @@ function AdminBootcamps() {
               <div><Label>Start</Label><Input type="date" value={form.start_date ?? ""} onChange={(e) => set("start_date", e.target.value)} /></div>
               <div><Label>End</Label><Input type="date" value={form.end_date ?? ""} onChange={(e) => set("end_date", e.target.value)} /></div>
               <div><Label>Reg. deadline</Label><Input type="date" value={form.registration_deadline ?? ""} onChange={(e) => set("registration_deadline", e.target.value)} /></div>
+            </div>
+            <div>
+              <Label>Curriculum (one item per line)</Label>
+              <Textarea rows={4} value={form.curriculum ?? ""} onChange={(e) => set("curriculum", e.target.value)} />
+            </div>
+            <div>
+              <Label>Projects you'll ship (one per line)</Label>
+              <Textarea rows={3} value={form.projects ?? ""} onChange={(e) => set("projects", e.target.value)} />
+            </div>
+            <div>
+              <Label>What you'll get / Benefits (one per line)</Label>
+              <Textarea rows={3} value={form.benefits ?? ""} onChange={(e) => set("benefits", e.target.value)} />
+            </div>
+            <div>
+              <Label>Requirements (one per line)</Label>
+              <Textarea rows={3} value={form.requirements ?? ""} onChange={(e) => set("requirements", e.target.value)} />
+            </div>
+            <div>
+              <Label>FAQ (question | answer per line)</Label>
+              <Textarea rows={4} value={form.faqs ?? ""} onChange={(e) => set("faqs", e.target.value)} />
             </div>
           </div>
           <DialogFooter>

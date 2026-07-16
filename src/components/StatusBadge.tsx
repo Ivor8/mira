@@ -14,6 +14,7 @@ const STYLES: Record<string, string> = {
   failed: "bg-destructive/10 text-destructive",
   refunded: "bg-muted text-muted-foreground",
   scheduled: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
+  past: "bg-muted text-muted-foreground",
   live: "bg-green-500/10 text-green-700 dark:text-green-400",
   open: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
   resolved: "bg-green-500/10 text-green-700 dark:text-green-400",

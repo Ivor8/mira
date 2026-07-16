@@ -50,14 +50,14 @@ function Hero() {
             <Sparkles className="h-3.5 w-3.5" />
             Cohort-based · Live · AI-powered
           </div>
-          <h1 className="mt-6 font-display text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
-            Become a professional <br className="hidden sm:block" />
-            <span className="text-brand-gradient animate-gradient">Full-Stack Developer</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
-            Live instructor-led bootcamps in modern web technologies & AI-assisted development.
-            Ship real projects, earn an official certificate, launch your career.
-          </p>
+            <h1 className="mt-6 font-display text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
+              Transform your potential <br className="hidden sm:block" />
+              <span className="text-brand-gradient animate-gradient">Design, Product & Tech Bootcamps</span>
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
+              Cohort-based, instructor-led training across graphic design, UI/UX, software engineering, product, and AI.
+              Hands-on projects, portfolio-ready outcomes, and career support to launch your next chapter.
+            </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link to="/bootcamps">
               <Button size="lg" className="rounded-full bg-brand-gradient px-7 py-6 text-base font-semibold text-white shadow-2xl shadow-primary/40 hover:opacity-90">
@@ -119,8 +119,8 @@ function Features() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-primary">Why Mira Edge</p>
-          <h2 className="mt-3 font-display text-3xl font-bold sm:text-5xl">A modern academy for modern engineers</h2>
-          <p className="mt-4 text-muted-foreground">Everything you need to go from curious learner to production-ready developer.</p>
+            <h2 className="mt-3 font-display text-3xl font-bold sm:text-5xl">A modern academy for creative and technical careers</h2>
+            <p className="mt-4 text-muted-foreground">Everything you need to go from curious learner to portfolio-ready creator or practitioner.</p>
         </motion.div>
         <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {items.map((f, i) => (
@@ -265,10 +265,10 @@ function Curriculum() {
       <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-2">
         <motion.div {...fadeUp}>
           <p className="text-xs font-semibold uppercase tracking-widest text-primary">Curriculum</p>
-          <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Everything a modern full-stack engineer ships</h2>
-          <p className="mt-4 text-muted-foreground">
-            Our curriculum is designed and taught by working engineers. Each module ends with a project you can deploy and put in your portfolio.
-          </p>
+            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Practical curricula for real-world impact</h2>
+            <p className="mt-4 text-muted-foreground">
+              Courses designed and taught by industry practitioners. Each module finishes with hands-on work you can showcase in your portfolio.
+            </p>
           <Link to="/bootcamps" className="mt-6 inline-block">
             <Button className="rounded-full bg-brand-gradient text-white">Explore bootcamps <ArrowRight className="ml-2 h-4 w-4" /></Button>
           </Link>
@@ -325,12 +325,12 @@ function CTA() {
         <motion.div {...fadeUp} className="relative overflow-hidden rounded-3xl bg-brand-gradient p-10 text-center text-white shadow-2xl shadow-primary/30 sm:p-16">
           <div className="absolute inset-0 bg-hero-grid opacity-20" />
           <div className="relative">
-            <h2 className="font-display text-3xl font-bold sm:text-5xl">Ready to become a full-stack engineer?</h2>
+            <h2 className="font-display text-3xl font-bold sm:text-5xl">Ready to start your creative or technical career?</h2>
             <p className="mx-auto mt-4 max-w-2xl text-white/80">
-              Join the next Mira Edge cohort. Live classes, real projects, official certificate.
+              Explore programs across design, product, and technology. Cohort-based learning, hands-on projects, and career support to get you hired.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Link to="/bootcamps"><Button size="lg" className="rounded-full bg-white px-7 py-6 text-base font-semibold text-navy-deep hover:bg-white/90">Join a bootcamp</Button></Link>
+              <Link to="/bootcamps"><Button size="lg" className="rounded-full bg-white px-7 py-6 text-base font-semibold text-navy-deep hover:bg-white/90">Explore programs</Button></Link>
               <Link to="/contact"><Button size="lg" variant="outline" className="rounded-full border-white/40 bg-white/10 px-7 py-6 text-base text-white backdrop-blur hover:bg-white/20">Talk to us</Button></Link>
             </div>
           </div>
