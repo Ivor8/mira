@@ -8,6 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
 
+function getAppOrigin() {
+  if (typeof window !== "undefined" && window.location?.origin) return window.location.origin;
+  if (import.meta.env.VITE_APP_URL) return import.meta.env.VITE_APP_URL;
+  if (import.meta.env.VITE_SITE_URL) return import.meta.env.VITE_SITE_URL;
+  return "https://miraedge-academy.com";
+}
+
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({ meta: [{ title: "Reset password — Mira Edge Academy" }] }),
   component: ForgotPage,
@@ -21,7 +28,7 @@ function ForgotPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${getAppOrigin()}/reset-password` });
     setBusy(false);
     if (error) return toast.error(error.message);
     setSent(true);

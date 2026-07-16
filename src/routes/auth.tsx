@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, CheckCircle2, Mail, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,22 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Logo } from "@/components/Logo";
 
-const searchSchema = z.object({ next: z.string().optional() });
+const searchSchema = z.object({ next: z.string().optional(), mode: z.enum(["signin", "signup", "verified"]).optional(), email: z.string().optional() });
+
+function getAppOrigin() {
+  if (typeof window !== "undefined" && window.location?.origin) return window.location.origin;
+  if (import.meta.env.VITE_APP_URL) return import.meta.env.VITE_APP_URL;
+  if (import.meta.env.VITE_SITE_URL) return import.meta.env.VITE_SITE_URL;
+  return "https://miraedge-academy.com";
+}
+
+function buildAuthCallbackUrl(mode: "verified" | "reset", email?: string, next = "/dashboard") {
+  const url = new URL("/auth", getAppOrigin());
+  url.searchParams.set("mode", mode === "verified" ? "verified" : "reset");
+  if (email) url.searchParams.set("email", email);
+  if (next) url.searchParams.set("next", next);
+  return url.toString();
+}
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s) => searchSchema.parse(s),
@@ -20,15 +35,32 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const { next } = Route.useSearch();
+  const { next, mode, email: emailFromQuery } = Route.useSearch();
   const navigate = useNavigate();
   const [tab, setTab] = useState<"signin" | "signup">("signin");
+  const [view, setView] = useState<"form" | "signup-success" | "verified-success">("form");
+  const [pendingEmail, setPendingEmail] = useState("");
 
   useEffect(() => {
+    const hash = typeof window !== "undefined" ? window.location.hash : "";
+    const hashHasSession = hash.includes("access_token") || hash.includes("refresh_token");
+
+    if (mode === "verified" || hashHasSession) {
+      setView("verified-success");
+      setTab("signin");
+      if (emailFromQuery) setPendingEmail(emailFromQuery);
+      return;
+    }
+
+    setView("form");
+  }, [emailFromQuery, mode]);
+
+  useEffect(() => {
+    if (mode === "verified") return;
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) navigate({ to: (next ?? "/dashboard") as any });
     });
-  }, [next, navigate]);
+  }, [mode, next, navigate]);
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -48,18 +80,54 @@ function AuthPage() {
           </div>
 
           <div className="card-elevated p-6 backdrop-blur">
-            <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
-              <TabsList className="grid w-full grid-cols-2 rounded-full">
-                <TabsTrigger value="signin" className="rounded-full">Sign in</TabsTrigger>
-                <TabsTrigger value="signup" className="rounded-full">Create account</TabsTrigger>
-              </TabsList>
-              <TabsContent value="signin" className="mt-6">
-                <SignInForm onDone={() => navigate({ to: (next ?? "/dashboard") as any })} />
-              </TabsContent>
-              <TabsContent value="signup" className="mt-6">
-                <SignUpForm onDone={() => navigate({ to: (next ?? "/dashboard") as any })} />
-              </TabsContent>
-            </Tabs>
+            {view === "form" ? (
+              <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
+                <TabsList className="grid w-full grid-cols-2 rounded-full">
+                  <TabsTrigger value="signin" className="rounded-full">Sign in</TabsTrigger>
+                  <TabsTrigger value="signup" className="rounded-full">Create account</TabsTrigger>
+                </TabsList>
+                <TabsContent value="signin" className="mt-6">
+                  <SignInForm onDone={() => navigate({ to: (next ?? "/dashboard") as any })} />
+                </TabsContent>
+                <TabsContent value="signup" className="mt-6">
+                  <SignUpForm
+                    next={next}
+                    onDone={(email) => {
+                      setPendingEmail(email);
+                      setView("signup-success");
+                      setTab("signin");
+                    }}
+                  />
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <div className="space-y-4">
+                <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5 text-center">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15">
+                    {view === "signup-success" ? <Mail className="h-6 w-6 text-emerald-600" /> : <CheckCircle2 className="h-6 w-6 text-emerald-600" />}
+                  </div>
+                  <h2 className="mt-4 text-xl font-semibold">
+                    {view === "signup-success" ? "Account created successfully" : "Email verified successfully"}
+                  </h2>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {view === "signup-success"
+                      ? `We sent a verification link to ${pendingEmail || "your email"}. Please open it, then return here to sign in.`
+                      : "Your email address is now verified. You can continue to the sign in page and access your account."}
+                  </p>
+                </div>
+
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setView("form");
+                    setTab("signin");
+                  }}
+                  className="w-full rounded-full bg-brand-gradient py-6 text-base font-semibold text-white shadow-lg shadow-primary/30"
+                >
+                  Proceed to sign in <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         </motion.div>
       </div>
@@ -110,7 +178,7 @@ function SignInForm({ onDone }: { onDone: () => void }) {
   );
 }
 
-function SignUpForm({ onDone }: { onDone: () => void }) {
+function SignUpForm({ onDone, next }: { onDone: (email: string) => void; next?: string }) {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -120,14 +188,24 @@ function SignUpForm({ onDone }: { onDone: () => void }) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signUp({
-      email, password,
-      options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: { full_name: fullName, phone } },
+    const normalizedEmail = email.trim().toLowerCase();
+    const { data, error } = await supabase.auth.signUp({
+      email: normalizedEmail,
+      password,
+      options: {
+        emailRedirectTo: buildAuthCallbackUrl("verified", normalizedEmail, next ?? "/dashboard"),
+        data: { full_name: fullName, phone },
+      },
     });
     setBusy(false);
     if (error) return toast.error(error.message);
-    toast.success("Account created!");
-    onDone();
+    if (data.user && !data.session) {
+      toast.success("Check your inbox to verify your email.");
+      onDone(normalizedEmail);
+      return;
+    }
+    toast.success("Account created successfully.");
+    onDone(normalizedEmail);
   };
 
   return (
