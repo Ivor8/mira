@@ -105,8 +105,18 @@ function StudentPayments() {
               <Select value={provider} onValueChange={(v) => setProvider(v as typeof provider)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="mtn_momo">MTN MoMo</SelectItem>
-                  <SelectItem value="orange_money">Orange Money</SelectItem>
+                  <SelectItem value="mtn_momo">
+                    <div className="flex items-center gap-2">
+                      <img src="/momo_mtna.png" alt="MTN MoMo" className="h-5 w-auto object-contain" />
+                      <span>MTN MoMo</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="orange_money">
+                    <div className="flex items-center gap-2">
+                      <img src="/Orange-Money-logo.png" alt="Orange Money" className="h-5 w-auto object-contain" />
+                      <span>Orange Money</span>
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>

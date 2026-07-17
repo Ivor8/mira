@@ -344,26 +344,34 @@ function BootcampDetail() {
                       <button
                         type="button"
                         onClick={() => setPaymentProvider("mtn_momo")}
-                        className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                        className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all cursor-pointer ${
                           paymentProvider === "mtn_momo"
                             ? "border-primary bg-primary/5 text-primary"
                             : "border-border hover:border-border/80"
                         }`}
                       >
+                        <img
+                          src="/momo_mtna.png"
+                          alt="MTN MoMo"
+                          className="h-10 w-auto object-contain"
+                        />
                         <span className="font-bold text-sm tracking-wider">MTN MoMo</span>
-                        <span className="text-[10px] text-muted-foreground mt-0.5">Yellow Card</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setPaymentProvider("orange_money")}
-                        className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                        className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all cursor-pointer ${
                           paymentProvider === "orange_money"
                             ? "border-orange-500 bg-orange-500/5 text-orange-500"
                             : "border-border hover:border-orange-500/80"
                         }`}
                       >
+                        <img
+                          src="/Orange-Money-logo.png"
+                          alt="Orange Money"
+                          className="h-10 w-auto object-contain"
+                        />
                         <span className="font-bold text-sm tracking-wider">Orange Money</span>
-                        <span className="text-[10px] text-muted-foreground mt-0.5">Orange Card</span>
                       </button>
                     </div>
                   </div>
