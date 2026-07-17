@@ -205,8 +205,11 @@ function SignUpForm({ onDone, next }: { onDone: (email: string) => void; next?: 
     setBusy(false);
     if (error) {
       console.error("Sign up error:", error);
-      // Show a helpful message to the user and surface debug info to console.
-      return toast.error(error.message || "Failed to create account. Try again later.");
+      const rateLimit = /rate limit/i.test(error.message || "");
+      const userMessage = rateLimit
+        ? "Too many verification emails sent recently. Please wait a few minutes and try again."
+        : error.message || "Failed to create account. Try again later.";
+      return toast.error(userMessage);
     }
     if (data?.user && !data?.session) {
       toast.success("Check your inbox to verify your email.");
