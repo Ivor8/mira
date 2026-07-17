@@ -21,11 +21,14 @@ function getAppOrigin() {
 }
 
 function buildAuthCallbackUrl(mode: "verified" | "reset", email?: string, next = "/dashboard") {
-  const url = new URL("/auth", getAppOrigin());
-  url.searchParams.set("mode", mode === "verified" ? "verified" : "reset");
-  if (email) url.searchParams.set("email", email);
-  if (next) url.searchParams.set("next", next);
-  return url.toString();
+  const origin = getAppOrigin();
+  // Construct the callback URL WITHOUT pre-encoding the email so the Supabase
+  // client will perform a single encoding when sending the redirect_to param.
+  const params = [] as string[];
+  params.push(`mode=${mode === "verified" ? "verified" : "reset"}`);
+  if (email) params.push(`email=${email}`);
+  if (next) params.push(`next=${next}`);
+  return `${origin}/auth?${params.join("&")}`;
 }
 
 export const Route = createFileRoute("/auth")({
@@ -189,17 +192,23 @@ function SignUpForm({ onDone, next }: { onDone: (email: string) => void; next?: 
     e.preventDefault();
     setBusy(true);
     const normalizedEmail = email.trim().toLowerCase();
+    const redirectTo = buildAuthCallbackUrl("verified", normalizedEmail, next ?? "/dashboard");
+    console.log("SignUp redirectTo:", redirectTo);
     const { data, error } = await supabase.auth.signUp({
       email: normalizedEmail,
       password,
       options: {
-        emailRedirectTo: buildAuthCallbackUrl("verified", normalizedEmail, next ?? "/dashboard"),
+        emailRedirectTo: redirectTo,
         data: { full_name: fullName, phone },
       },
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
-    if (data.user && !data.session) {
+    if (error) {
+      console.error("Sign up error:", error);
+      // Show a helpful message to the user and surface debug info to console.
+      return toast.error(error.message || "Failed to create account. Try again later.");
+    }
+    if (data?.user && !data?.session) {
       toast.success("Check your inbox to verify your email.");
       onDone(normalizedEmail);
       return;
