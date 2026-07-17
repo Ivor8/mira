@@ -84,7 +84,11 @@ export function SiteHeader() {
               <Link to="/auth" className="hidden md:inline-flex">
                 <Button variant="ghost" className="rounded-full">Sign in</Button>
               </Link>
-              <Link to="/bootcamps" className="hidden md:inline-flex">
+              <Link
+                to="/auth"
+                search={{ mode: "signup", next: "/bootcamps" }}
+                className="hidden md:inline-flex"
+              >
                 <Button className="rounded-full bg-brand-gradient text-white shadow-lg shadow-primary/30 hover:opacity-90">
                   Join Bootcamp
                 </Button>
@@ -128,7 +132,7 @@ export function SiteHeader() {
                   <Link to="/auth" onClick={() => setOpen(false)} className="flex-1">
                     <Button variant="secondary" className="w-full rounded-full">Sign in</Button>
                   </Link>
-                  <Link to="/bootcamps" onClick={() => setOpen(false)} className="flex-1">
+                  <Link to="/auth" search={{ mode: "signup", next: "/bootcamps" }} onClick={() => setOpen(false)} className="flex-1">
                     <Button className="w-full rounded-full bg-brand-gradient text-white">Join</Button>
                   </Link>
                 </>

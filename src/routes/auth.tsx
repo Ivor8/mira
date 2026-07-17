@@ -40,7 +40,7 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const { next, mode, email: emailFromQuery } = Route.useSearch();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"signin" | "signup">("signin");
+  const [tab, setTab] = useState<"signin" | "signup">(mode === "signup" ? "signup" : "signin");
   const [view, setView] = useState<"form" | "signup-success" | "verified-success">("form");
   const [pendingEmail, setPendingEmail] = useState("");
 
@@ -56,6 +56,7 @@ function AuthPage() {
     }
 
     setView("form");
+    setTab(mode === "signup" ? "signup" : "signin");
   }, [emailFromQuery, mode]);
 
   useEffect(() => {
@@ -70,9 +71,13 @@ function AuthPage() {
       <div className="pointer-events-none absolute inset-0 bg-hero-grid opacity-30" />
       <div className="pointer-events-none absolute -top-40 left-1/2 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-brand-gradient opacity-20 blur-3xl animate-gradient" />
 
-      <Link to="/" className="absolute left-6 top-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+      <button
+        type="button"
+        onClick={() => navigate({ to: "/" })}
+        className="absolute left-6 top-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+      >
         <ArrowLeft className="h-4 w-4" /> Back home
-      </Link>
+      </button>
 
       <div className="relative flex min-h-screen items-center justify-center px-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
