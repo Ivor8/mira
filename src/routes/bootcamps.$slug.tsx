@@ -352,7 +352,7 @@ function BootcampDetail() {
                       >
                         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/90 p-1 shadow-sm ring-1 ring-black/5">
                           <img
-                            src="/momo_mtna.png"
+                            src="/momo%20logo%202.png"
                             alt="MTN MoMo"
                             className="h-10 w-auto object-contain"
                           />
