@@ -350,11 +350,13 @@ function BootcampDetail() {
                             : "border-border hover:border-border/80"
                         }`}
                       >
-                        <img
-                          src="/momo_mtna.png"
-                          alt="MTN MoMo"
-                          className="h-10 w-auto object-contain"
-                        />
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/90 p-1 shadow-sm ring-1 ring-black/5">
+                          <img
+                            src="/momo_mtna.png"
+                            alt="MTN MoMo"
+                            className="h-10 w-auto object-contain"
+                          />
+                        </div>
                         <span className="font-bold text-sm tracking-wider">MTN MoMo</span>
                       </button>
                       <button
@@ -366,11 +368,13 @@ function BootcampDetail() {
                             : "border-border hover:border-orange-500/80"
                         }`}
                       >
-                        <img
-                          src="/Orange-Money-logo.png"
-                          alt="Orange Money"
-                          className="h-10 w-auto object-contain"
-                        />
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/90 p-1 shadow-sm ring-1 ring-black/5">
+                          <img
+                            src="/Orange-Money-logo.png"
+                            alt="Orange Money"
+                            className="h-10 w-auto object-contain"
+                          />
+                        </div>
                         <span className="font-bold text-sm tracking-wider">Orange Money</span>
                       </button>
                     </div>

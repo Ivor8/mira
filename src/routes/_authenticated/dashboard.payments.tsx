@@ -107,13 +107,17 @@ function StudentPayments() {
                 <SelectContent>
                   <SelectItem value="mtn_momo">
                     <div className="flex items-center gap-2">
-                      <img src="/momo_mtna.png" alt="MTN MoMo" className="h-5 w-auto object-contain" />
+                      <div className="flex h-7 w-7 items-center justify-center rounded-md bg-white/90 p-1 shadow-sm ring-1 ring-black/5">
+                        <img src="/momo_mtna.png" alt="MTN MoMo" className="h-5 w-auto object-contain" />
+                      </div>
                       <span>MTN MoMo</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="orange_money">
                     <div className="flex items-center gap-2">
-                      <img src="/Orange-Money-logo.png" alt="Orange Money" className="h-5 w-auto object-contain" />
+                      <div className="flex h-7 w-7 items-center justify-center rounded-md bg-white/90 p-1 shadow-sm ring-1 ring-black/5">
+                        <img src="/Orange-Money-logo.png" alt="Orange Money" className="h-5 w-auto object-contain" />
+                      </div>
                       <span>Orange Money</span>
                     </div>
                   </SelectItem>
