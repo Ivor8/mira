@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { formatXAF, daysUntil } from "@/lib/format";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { PaymentReceiptModal, type ReceiptPayment } from "@/components/PaymentReceiptModal";
 
 
 export const Route = createFileRoute("/bootcamps/$slug")({
@@ -31,6 +32,8 @@ function BootcampDetail() {
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "initiating" | "pending_pin" | "success" | "failed">("idle");
   const [paymentError, setPaymentError] = useState("");
   const [transactionId, setTransactionId] = useState("");
+  const [completedPayment, setCompletedPayment] = useState<ReceiptPayment | null>(null);
+  const [showReceipt, setShowReceipt] = useState(false);
 
   const pollIntervalRef = useRef<any>(null);
 
@@ -95,11 +98,18 @@ function BootcampDetail() {
           registrationQuery.refetch();
           qc.invalidateQueries({ queryKey: ["bootcamp", slug] });
           qc.invalidateQueries({ queryKey: ["registration", user?.id, slug] });
-
-          setTimeout(() => {
-            setShowPayModal(false);
-            navigate({ to: "/dashboard" });
-          }, 2000);
+          // Store completed payment for receipt
+          setCompletedPayment({
+            id: data.paymentId ?? transactionId,
+            amount: b!.price,
+            currency: b!.currency,
+            provider: paymentProvider,
+            status: "successful",
+            phone_number: phoneNumber,
+            transaction_ref: data.transId ?? transactionId,
+            created_at: new Date().toISOString(),
+            bootcamp: { title: b!.title },
+          });
         } else if (data.status === "FAILED") {
           if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
           setPaymentStatus("failed");
@@ -438,14 +448,17 @@ function BootcampDetail() {
             )}
 
             {paymentStatus === "success" && (
-              <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+              <div className="flex flex-col items-center justify-center py-8 text-center space-y-4">
                 <div className="h-16 w-16 bg-green-500/10 rounded-full flex items-center justify-center border border-green-500/20">
                   <CheckCircle2 className="h-10 w-10 text-green-500 animate-bounce" />
                 </div>
                 <div>
                   <p className="font-bold text-xl text-green-600 dark:text-green-500">Payment Confirmed!</p>
                   <p className="mt-2 text-sm text-muted-foreground">Your seat has been reserved and your registration is confirmed.</p>
-                  <p className="mt-1 text-xs text-muted-foreground">Redirecting you to dashboard...</p>
+                </div>
+                <div className="flex w-full gap-3">
+                  <Button variant="outline" onClick={() => { setShowPayModal(false); navigate({ to: "/dashboard" }); }} className="flex-1 rounded-xl">Go to Dashboard</Button>
+                  <Button onClick={() => setShowReceipt(true)} className="flex-1 bg-brand-gradient text-white rounded-xl">Download Receipt</Button>
                 </div>
               </div>
             )}
@@ -482,6 +495,11 @@ function BootcampDetail() {
         </Dialog>
       </main>
       <SiteFooter />
+      <PaymentReceiptModal
+        payment={showReceipt ? completedPayment : null}
+        studentName={user?.user_metadata?.full_name ?? user?.email}
+        onClose={() => setShowReceipt(false)}
+      />
     </div>
   );
 }

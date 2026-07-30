@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { formatXAF } from "@/lib/format";
 import { format } from "date-fns";
+import { PaymentReceiptModal, type ReceiptPayment } from "@/components/PaymentReceiptModal";
 
 export const Route = createFileRoute("/_authenticated/dashboard/payments")({
   component: StudentPayments,
@@ -24,6 +25,7 @@ function StudentPayments() {
   const [bootcampId, setBootcampId] = useState("");
   const [provider, setProvider] = useState<"mtn_momo" | "orange_money">("mtn_momo");
   const [phone, setPhone] = useState("");
+  const [selectedPayment, setSelectedPayment] = useState<ReceiptPayment | null>(null);
 
   const { data: regs } = useQuery({
     queryKey: ["my-regs-pay", user?.id],
@@ -156,6 +158,7 @@ function StudentPayments() {
                 <TableHead>Provider</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Date</TableHead>
+                <TableHead />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -166,12 +169,23 @@ function StudentPayments() {
                   <TableCell className="capitalize">{p.provider.replace(/_/g, " ")}</TableCell>
                   <TableCell><StatusBadge status={p.status} /></TableCell>
                   <TableCell className="text-muted-foreground">{format(new Date(p.created_at), "PP")}</TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="sm" className="rounded-full text-xs" onClick={() => setSelectedPayment(p as ReceiptPayment)}>
+                      View Details
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         )}
       </div>
+
+      <PaymentReceiptModal
+        payment={selectedPayment}
+        studentName={user?.user_metadata?.full_name ?? user?.email}
+        onClose={() => setSelectedPayment(null)}
+      />
     </AppShell>
   );
 }
