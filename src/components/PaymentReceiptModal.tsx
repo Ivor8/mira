@@ -13,6 +13,7 @@ export type ReceiptPayment = {
   status: string;
   phone_number?: string | null;
   transaction_ref?: string | null;
+  registration_id?: string | null;
   created_at: string;
   bootcamp?: { title: string } | null;
 };
@@ -56,13 +57,14 @@ export function PaymentReceiptModal({ payment, studentName, onClose }: Props) {
     <p>Payment Receipt</p>
   </div>
   <table>
-    <tr><td>Receipt ID</td><td>${payment.id}</td></tr>
+    <tr><td>Receipt ID</td><td>${(payment as any).id ?? (payment as any).paymentId ?? "—"}</td></tr>
     <tr><td>Student</td><td>${studentName ?? "—"}</td></tr>
     <tr><td>Bootcamp</td><td>${payment.bootcamp?.title ?? "—"}</td></tr>
     <tr><td>Amount</td><td>${formatXAF(payment.amount, payment.currency)}</td></tr>
     <tr><td>Provider</td><td>${payment.provider.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</td></tr>
     <tr><td>Phone</td><td>${payment.phone_number ?? "—"}</td></tr>
-    <tr><td>Transaction Ref</td><td>${payment.transaction_ref ?? "—"}</td></tr>
+    <tr><td>Transaction Ref</td><td>${payment.transaction_ref ?? (payment as any).transactionRef ?? (payment as any).transId ?? "—"}</td></tr>
+    <tr><td>Registration ID</td><td>${payment.registration_id ?? (payment as any).registrationId ?? "—"}</td></tr>
     <tr><td>Status</td><td><span class="badge">${payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}</span></td></tr>
     <tr><td>Date</td><td>${format(new Date(payment.created_at), "PPPp")}</td></tr>
   </table>
@@ -89,12 +91,15 @@ export function PaymentReceiptModal({ payment, studentName, onClose }: Props) {
         </DialogHeader>
 
         <div className="space-y-3 py-2 text-sm">
-          <Row label="Receipt ID" value={<span className="font-mono text-xs break-all">{payment.id}</span>} />
+          <Row label="Receipt ID" value={<span className="font-mono text-xs break-all">{(payment as any).id ?? (payment as any).paymentId ?? "—"}</span>} />
           <Row label="Bootcamp" value={payment.bootcamp?.title ?? "—"} />
           <Row label="Amount" value={<span className="font-bold text-base">{formatXAF(payment.amount, payment.currency)}</span>} />
           <Row label="Provider" value={payment.provider.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())} />
           {payment.phone_number && <Row label="Phone" value={payment.phone_number} />}
-          {payment.transaction_ref && <Row label="Transaction Ref" value={<span className="font-mono text-xs">{payment.transaction_ref}</span>} />}
+          {((payment as any).transaction_ref || (payment as any).transactionRef || (payment as any).transId) && (
+            <Row label="Transaction Ref" value={<span className="font-mono text-xs">{payment.transaction_ref ?? (payment as any).transactionRef ?? (payment as any).transId}</span>} />
+          )}
+          {(payment.registration_id || (payment as any).registrationId) && <Row label="Registration ID" value={<span className="font-mono text-xs">{payment.registration_id ?? (payment as any).registrationId}</span>} />}
           <Row label="Status" value={<StatusBadge status={payment.status} />} />
           <Row label="Date" value={format(new Date(payment.created_at), "PPPp")} />
         </div>
