@@ -5,9 +5,10 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { ExternalLink, Video } from "lucide-react";
+import { Video } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { SessionJoinButton } from "@/components/SessionJoinButton";
 
 export const Route = createFileRoute("/_authenticated/dashboard/sessions")({
   component: StudentSessions,
@@ -151,13 +152,12 @@ function SessionRow({
         </div>
       </div>
       {!past && onJoin && (
-        <Button
-          onClick={onJoin}
-          disabled={busy}
+        <SessionJoinButton
+          session={s}
+          onJoin={onJoin}
+          busy={busy}
           className="rounded-full bg-brand-gradient text-white"
-        >
-          Join class <ExternalLink className="ml-2 h-4 w-4" />
-        </Button>
+        />
       )}
     </div>
   );

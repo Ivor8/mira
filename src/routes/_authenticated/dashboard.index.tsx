@@ -3,9 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { GraduationCap, Calendar, Award, CreditCard, ExternalLink } from "lucide-react";
+import { GraduationCap, Calendar, Award, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { SessionJoinButton } from "@/components/SessionJoinButton";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
@@ -93,9 +94,14 @@ function DashboardHome() {
               <p className="mt-1 text-xs text-muted-foreground">{nextSession.bootcamp?.title}</p>
               <p className="mt-3 text-sm">{format(new Date(nextSession.session_date), "PPP")}</p>
               <p className="text-sm text-muted-foreground">{nextSession.start_time} — {nextSession.end_time}</p>
-              <a href={nextSession.meet_url} target="_blank" rel="noreferrer" className="mt-4 inline-block w-full">
-                <Button className="w-full rounded-full bg-brand-gradient text-white">Join live class <ExternalLink className="ml-2 h-4 w-4" /></Button>
-              </a>
+              <div className="mt-4">
+                <SessionJoinButton
+                  session={nextSession}
+                  onJoin={() => window.open(nextSession.meet_url, "_blank", "noopener,noreferrer")}
+                  className="rounded-full bg-brand-gradient text-white"
+                  fullWidth
+                />
+              </div>
             </div>
           ) : (
             <p className="mt-4 text-sm text-muted-foreground">No upcoming sessions scheduled.</p>

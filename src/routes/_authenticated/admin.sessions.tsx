@@ -136,8 +136,20 @@ function AdminSessions() {
         const { error } = await supabase.from("sessions").update(payload).eq("id", editing.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("sessions").insert(payload);
-        if (error) throw error;
+        const { data: authData } = await supabase.auth.getSession();
+        const response = await fetch("/api/admin/sessions", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${authData.session?.access_token ?? ""}`,
+          },
+          body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Failed to create session");
+        if (result.emailError) {
+          toast.warning(`Session created, but email delivery failed: ${result.emailError}`);
+        }
       }
     },
     onSuccess: () => {
