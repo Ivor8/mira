@@ -189,7 +189,15 @@ function BootcampDetail() {
       <main>
         <section className="relative overflow-hidden pt-32 pb-16">
           <div className="absolute inset-0 bg-brand-gradient opacity-10" />
+          {b.cover_image_url ? (
+            <img
+              src={b.cover_image_url}
+              alt=""
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-20"
+            />
+          ) : null}
           <div className="absolute inset-0 bg-hero-grid opacity-30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-black/40" />
           <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
             <motion.nav initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-muted-foreground">
               <Link to="/bootcamps" className="hover:text-foreground">Bootcamps</Link>

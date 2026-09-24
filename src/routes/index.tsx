@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Sparkles, Code2, Rocket, GraduationCap, Users, Zap, Award, PlayCircle, CheckCircle2, Calendar, Clock } from "lucide-react";
+import { ArrowRight, Sparkles, Code2, Rocket, GraduationCap, Users, Zap, Award, PlayCircle, CheckCircle2, Calendar, Clock, Send } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,12 @@ function Hero() {
   return (
     <section className="relative overflow-hidden pt-32 pb-24 sm:pt-40 sm:pb-32">
       <div className="absolute inset-0 bg-hero-grid opacity-40" />
+      <img
+        src="/site-hero.png"
+        alt=""
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-45"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-black/30" />
       <div className="absolute -top-40 left-1/2 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-brand-gradient opacity-30 blur-3xl animate-gradient" />
       <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
 
@@ -69,6 +75,15 @@ function Hero() {
                 <PlayCircle className="mr-2 h-4 w-4" /> Browse bootcamps
               </Button>
             </Link>
+            <a
+              href="https://wa.me/237676514428?text=Hello%20Mira%20Edge%20Academy%2C%20I%20would%20like%20to%20enquire%20about%20a%20private%20online%20bootcamp."
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button size="lg" variant="outline" className="rounded-full border-emerald-500/40 bg-emerald-500/5 px-7 py-6 text-base backdrop-blur hover:border-emerald-500/60 hover:bg-emerald-500/10">
+                <Send className="mr-2 h-4 w-4 text-emerald-500" /> Private bootcamps
+              </Button>
+            </a>
           </div>
 
           <div className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs uppercase tracking-widest text-muted-foreground">

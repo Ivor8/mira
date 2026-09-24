@@ -136,12 +136,9 @@ function RootComponent() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Contact us on WhatsApp"
-          className="group fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 transition-all duration-200 hover:scale-105 hover:bg-[#1ebe57]"
+          className="group fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-emerald-600/30 ring-4 ring-emerald-500/15 transition-all duration-200 hover:scale-110 hover:bg-[#1ebe57] hover:ring-emerald-500/25"
         >
-          <FaWhatsapp className="h-5 w-5" />
-          <span className="max-w-0 overflow-hidden opacity-0 transition-all duration-200 group-hover:max-w-[120px] group-hover:opacity-100">
-            Contact us
-          </span>
+          <FaWhatsapp className="h-7 w-7" />
         </a>
       )}
       <Toaster />
